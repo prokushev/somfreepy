@@ -25,6 +25,7 @@ somdll = WinDLL("som.dll", winmode=0)
 somToken=c_void_p;
 
 somDToken=somToken;
+somMToken=somToken;
 
 somClassInfo=somToken;
 
@@ -43,7 +44,7 @@ class somMethodTab(Structure):
 		("protectedDataOffset", c_long),
 		("protectedDataToken", somDToken),
 		("embeddedObjs", c_void_p),
-		("entries", ARRAY(somMethodPtr,1))
+		("entries", ARRAY(somMethodProc,1))
 		]
 	
 
@@ -51,16 +52,24 @@ class SOMAny(Structure):
 	_fields_ = [("mtab", POINTER(somMethodTab))]
 
 ##
+# Variables
+##
+
+SOM_TraceLevel=c_int.in_dll(somdll,"SOM_TraceLevel")
+
+##
 # SOM Run-time functions
 ##
 
+#SOMEXTERN SOM_IMPORTEXPORT_som somMethodProc * SOMLINK somResolveByName(SOMObject SOMSTAR obj,char *methodName);
+somdll.somResolveByName.argtypes = [c_void_p, c_char_p]
+somdll.somResolveByName.restype = c_void_p
+somResolveByName=somdll.somResolveByName
+
+from somcm import *
 
 #SOMEXTERN SOM_IMPORTEXPORT_som SOMClassMgr SOMSTAR SOMLINK somEnvironmentNew(void);
 somdll.somEnvironmentNew.argtypes = None
 somdll.somEnvironmentNew.restype = c_void_p
-somEnvironmentNew=somdll.somEnvironmentNew
-
-#SOMEXTERN SOM_IMPORTEXPORT_som somMethodProc * SOMLINK somResolveByName(SOMObject SOMSTAR obj,char *methodName);
-somdll.somResolveByName.argtypes = [c_void_p, c_char_p]
-somdll.somResolveByName.restype = c_void_p #POINTER(somMethodProc)
-somResolveByName=somdll.somResolveByName
+def somEnvironmentNew():
+	return SOMClassMgr(somdll.somEnvironmentNew())
