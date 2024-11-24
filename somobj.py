@@ -1,7 +1,7 @@
 from som import *
 from ctypes import *
 
-# Forward declatation of SOMClass
+# Forward declaration of SOMClass
 class SOMClass:
 	pass
 
@@ -77,10 +77,16 @@ class SOMObject:
 		print(self.obj)
 
 	def somInit(self):
-		pass
+		mp=somResolveByName(self.obj, b"somInit")
+		somTD_SOMObject_somInit = WINFUNCTYPE(None, c_void_p) 
+		somInit = somTD_SOMObject_somInit(mp)
+		somInit(self.obj)
 
 	def somUninit(self):
-		pass
+		mp=somResolveByName(self.obj, b"somUninit")
+		somTD_SOMObject_somUninit = WINFUNCTYPE(None, c_void_p) 
+		somUninit = somTD_SOMObject_somUninit(mp)
+		somUninit(self.obj)
 
 	def somFree(self):
 		mp=somResolveByName(self.obj, b"somFree")
@@ -99,16 +105,30 @@ class SOMObject:
 		return somGetClassName(self.obj) #return string
 
 	def somGetSize(self):
-		pass #return long
+		mp=somResolveByName(self.obj, b"somGetSize")
+		somTD_SOMObject_somGetSize = WINFUNCTYPE(c_long, c_void_p) 
+		somGetSize = somTD_SOMObject_somGetSize(mp)
+		return somGetSize(self.obj) #return long
 
-	def somIsA(self, aClassObj): #in SOMClass 
-		pass #return boolean
+	def somIsA(self, aClassObj): #in SOMClass
+		#@todo check type of aClassObj. If it is Python object then get SOM Object
+		mp=somResolveByName(self.obj, b"somIsA")
+		somTD_SOMObject_somIsA = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
+		somIsA = somTD_SOMObject_somIsA(mp)
+		return somGetSize(self.obj, aClassObj) #return boolean
 
 	def somIsInstanceOf(self, aClassObj): #in SOMClass 
-		pass #return boolean 
+		#@todo check type of aClassObj. If it is Python object then get SOM Object
+		mp=somResolveByName(self.obj, b"somIsInstanceOf")
+		somTD_SOMObject_somIsInstanceOf = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
+		somIsInstanceOf = somTD_SOMObject_somIsInstanceOf(mp)
+		return somGetSize(self.obj, aClassObj) #return boolean
 
 	def somRespondsTo(self, mId): #in somId 
-		pass #return boolean
+		mp=somResolveByName(self.obj, b"somRespondsTo")
+		somTD_SOMObject_somRespondsTo = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
+		somRespondsTo = somTD_SOMObject_somRespondsTo(mp)
+		return somRespondsTo(self.obj, aClassObj) #return boolean
 
 	def somDispatch(self, retValue, methodId, ap): #out somToken, in somId, in va_list
 		pass #return boolean
@@ -117,10 +137,17 @@ class SOMObject:
 		pass #return boolean
 
 	def somCastObj(self, castedCls): #in SOMClass
-		pass #return boolean
+		#@todo check type of aClassObj. If it is Python object then get SOM Object
+		mp=somResolveByName(self.obj, b"somCastObj")
+		somTD_SOMObject_somCastObj = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
+		somCastObj = somTD_SOMObject_somCastObj(mp)
+		return somCastObj(self.obj, aClassObj) #return boolean
 
 	def somResetObj(self):
-		pass #return boolean 
+		mp=somResolveByName(self.obj, b"somResetObj")
+		somTD_SOMObject_somResetObj = WINFUNCTYPE(c_boolean, c_void_p) 
+		somResetObj = somTD_SOMObject_somResetObj(mp)
+		return somResetObj(self.obj) #return boolean
 
 	def somPrintSelf(self):
 		mp=somResolveByName(self.obj, b"somPrintSelf")

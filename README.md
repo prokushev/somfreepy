@@ -1,7 +1,9 @@
 # somFreePy
 
 Experimental somFree mapping for Python
-somFreePy is a experiments of somFree usage under Python
+
+somFreePy is a experiments of somFree usage under Python. For now it is handmade classes for SOM Run-time
+classes SOMObject, SOMClass and SOMClassMgr as well as SOM.DLL functions.
 
 # Prepare environment
 
@@ -10,4 +12,4 @@ somFreePy is a experiments of somFree usage under Python
 
 # Test
 
-Run 'py test.py'
+Run 'somenv.cmd'
