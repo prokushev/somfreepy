@@ -72,9 +72,7 @@ class SOMObject:
 		self.obj=somNew(self.SOMObjectClassData.classObject)
 
 	def __del__(self):
-		print(self)
 		self.somFree()
-		print(self.obj)
 
 	def somInit(self):
 		mp=somResolveByName(self.obj, b"somInit")
@@ -89,6 +87,7 @@ class SOMObject:
 		somUninit(self.obj)
 
 	def somFree(self):
+		#@todo Destroy Python object too?
 		mp=somResolveByName(self.obj, b"somFree")
 		somTD_SOMObject_somFree = WINFUNCTYPE(None, c_void_p) 
 		somFree = somTD_SOMObject_somFree(mp)
@@ -96,7 +95,11 @@ class SOMObject:
 		self.obj=None
 
 	def somGetClass(self):
-		pass #return #SOMClass
+		#@todo  Return Python class???
+		mp=somResolveByName(self.obj, b"somGetClass")
+		somTD_SOMObject_somGetClass = WINFUNCTYPE(c_void_p, c_void_p) 
+		somGetClass = somTD_SOMObject_somGetClass(mp)
+		return somGetClassName(self.obj) #return SOMClass
 
 	def somGetClassName(self):
 		mp=somResolveByName(self.obj, b"somGetClassName")
@@ -159,13 +162,13 @@ class SOMObject:
 		mp=somResolveByName(self.obj, b"somDumpSelf")
 		somTD_SOMObject_somDumpSelf = WINFUNCTYPE(None, c_void_p, c_long) 
 		somDumpSelf = somTD_SOMObject_somDumpSelf(mp)
-		somDumpSelf(self.obj, level) #return SOMObject
+		somDumpSelf(self.obj, level)
 
 	def somDumpSelfInt(self, level): #in long
 		mp=somResolveByName(self.obj, b"somDumpSelfInt")
 		somTD_SOMObject_somDumpSelfInt = WINFUNCTYPE(None, c_void_p, c_long) 
 		somDumpSelfInt = somTD_SOMObject_somDumpSelfInt(mp)
-		somDumpSelfInt(self.obj, level) #return SOMObject
+		somDumpSelfInt(self.obj, level)
 
 	# SOM 2.1 style constructors/destructors
 
