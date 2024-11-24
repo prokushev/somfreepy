@@ -77,7 +77,6 @@ class SOMObject:
 			somNew = functype(mt)
 			self.obj=somNew(self.SOMObjectClassData.classObject)
 		else:
-			print(f"nonew{obj}={self.obj}")
 			self.obj=obj
 
 	def __del__(self: SOMObject):

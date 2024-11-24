@@ -3,6 +3,39 @@ from somobj import *
 class SOMClassMgr:
 	pass
 
+somdll.SOMClassMgrNewClass.argtypes = [c_int, c_int]
+somdll.SOMClassMgrNewClass.restype = c_void_p
+SOMClassMgrNewClass=somdll.SOMClassMgrNewClass
+
+class SOMClassMgrClassDataStructure(Structure):
+    _fields_ = (("classObject", c_void_p),
+		("somFindClsInFile", somMToken),
+		("somFindClass", somMToken),
+		("somClassFromId", somMToken),
+		("somRegisterClass", somMToken),
+		("somUnregisterClass", somMToken),
+		("somLocateClassFile", somMToken),
+		("somLoadClassFile", somMToken),
+		("somUnloadClassFile", somMToken),
+		("somGetInitFunction", somMToken),
+		("somMergeInto", somMToken),
+		("somGetRelatedClasses", somMToken),
+		("somSubstituteClass", somMToken),
+		("_get_somInterfaceRepository", somMToken),
+		("_set_somInterfaceRepository", somMToken),
+		("_get_somRegisteredClasses", somMToken),
+		("somBeginPersistentClasses", somMToken),
+		("somEndPersistentClasses", somMToken),
+		("somReleaseClasses", somMToken),
+		("somRegisterThreadUsage", somMToken),
+		("somRegisterClassLibrary", somMToken),
+		("somJoinAffinityGroup", somMToken),
+		("somUnregisterClassLibrary", somMToken),
+		("somImportObject", somMToken),
+		("private23", somMToken),
+		("private24", somMToken)
+		)
+
 class SOMClassMgr(SOMObject):
 
 	SOMClassMgrClassData=None
