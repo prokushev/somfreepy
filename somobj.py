@@ -1,10 +1,6 @@
 from som import *
 from ctypes import *
 
-# Forward declaration of SOMClass
-class SOMClass:
-	pass
-
 somdll.SOMObjectNewClass.argtypes = [c_int, c_int]
 somdll.SOMObjectNewClass.restype = c_void_p
 SOMObjectNewClass=somdll.SOMObjectNewClass
@@ -57,6 +53,9 @@ class SOMObjectClassDataStructure(Structure):
 class SOMObject:
 	pass
 
+class SOMClass:
+	pass
+
 class SOMObject:
 	
 #	typedef sequence<SOMObject> SOMObjectSequence;
@@ -68,10 +67,12 @@ class SOMObject:
 	obj=None
 
 	def __init__(self: SOMObject, obj: SOMObject=None):
+		if isinstance(obj, SOMObject):
+			obj=obj.obj
 		if obj==None:
 			self.SOMObjectClassData=SOMObjectClassDataStructure.in_dll(somdll,"SOMObjectClassData")
 			if self.SOMObjectClassData.classObject==None:
-				self.SOMObjectClassData.classObject=SOMObjectNewClass(1, 4)
+				self.SOMObjectClassData.classObject=SOMObjectNewClass(1, 7)
 			mt=somResolveByName(self.SOMObjectClassData.classObject, b"somNew")
 			functype = WINFUNCTYPE(c_void_p, c_void_p) 
 			somNew = functype(mt)
@@ -95,15 +96,13 @@ class SOMObject:
 		somUninit(self.obj)
 
 	def somFree(self: SOMObject):
-		#@todo Destroy Python object too?
 		mp=somResolveByName(self.obj, b"somFree")
 		somTD_SOMObject_somFree = WINFUNCTYPE(None, c_void_p) 
 		somFree = somTD_SOMObject_somFree(mp)
 		somFree(self.obj)
-		self.obj=None
 
-	def somGetClass(self: SOMObject) -> SOMClass:
-		#@todo  Return Python class???
+	# Returns a pointer to an object’s class object. Not generally overridden.
+	def somGetClass(self: SOMObject) -> 'SOMClass':
 		mp=somResolveByName(self.obj, b"somGetClass")
 		somTD_SOMObject_somGetClass = WINFUNCTYPE(c_void_p, c_void_p) 
 		somGetClass = somTD_SOMObject_somGetClass(mp)
@@ -122,14 +121,12 @@ class SOMObject:
 		return somGetSize(self.obj) #return long
 
 	def somIsA(self: SOMObject, aClassObj: SOMClass) -> bool: #in SOMClass
-		#@todo check type of aClassObj. If it is Python object then get SOM Object
 		mp=somResolveByName(self.obj, b"somIsA")
 		somTD_SOMObject_somIsA = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
 		somIsA = somTD_SOMObject_somIsA(mp)
 		return somGetSize(self.obj, aClassObj) #return boolean
 
 	def somIsInstanceOf(self: SOMObject, aClassObj: SOMClass) -> bool: #in SOMClass 
-		#@todo check type of aClassObj. If it is Python object then get SOM Object
 		mp=somResolveByName(self.obj, b"somIsInstanceOf")
 		somTD_SOMObject_somIsInstanceOf = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
 		somIsInstanceOf = somTD_SOMObject_somIsInstanceOf(mp)
@@ -148,7 +145,6 @@ class SOMObject:
 		pass #return boolean
 
 	def somCastObj(self: SOMObject, castedCls: SOMClass) -> bool: #in SOMClass
-		#@todo check type of aClassObj. If it is Python object then get SOM Object
 		mp=somResolveByName(self.obj, b"somCastObj")
 		somTD_SOMObject_somCastObj = WINFUNCTYPE(c_boolean, c_void_p, c_void_p) 
 		somCastObj = somTD_SOMObject_somCastObj(mp)
@@ -165,12 +161,7 @@ class SOMObject:
 		mp=somResolveByName(self.obj, b"somPrintSelf")
 		somTD_SOMObject_somPrintSelf = WINFUNCTYPE(c_void_p, c_void_p) 
 		somPrintSelf = somTD_SOMObject_somPrintSelf(mp)
-		obj=somPrintSelf(self.obj)
-		if obj==self.obj:
-			return self
-		# This must not be happen
-		else:
-			return SOMObject(obj)
+		return somPrintSelf(self.obj)
 
 	# Writes out a detailed description of the receiving object. Intended for use by object clients.
 	# Not generally overridden.
@@ -194,32 +185,59 @@ class SOMObject:
 		mp=somResolveByName(self.obj, b"somDefaultInit")
 		somTD_SOMObject_somDefaultInit = WINFUNCTYPE(None, c_void_p, c_void_p) 
 		somDefaultInit = somTD_SOMObject_somDefaultInit(mp)
-		somDefaultInit(self.obj, level)
+		somDefaultInit(self.obj, ctrl)
 
 	def somDefaultCopyInit(self: SOMObject, ctrl, fromObj): #inout somInitCtrl, in SOMObject
-		pass
+		mp=somResolveByName(self.obj, b"somDefaultCopyInit")
+		somTD_SOMObject_somDefaultCopyInit = WINFUNCTYPE(None, c_void_p, c_void_p, c_void_p) 
+		somDefaultCopyInit = somTD_SOMObject_somDefaultCopyInit(mp)
+		somDefaultCopyInit(self.obj, ctrl, fromObj)
 
 	def somDefaultConstCopyInit(self: SOMObject, ctrl, fromObj): #inout somInitCtrl, in SOMObject
-		pass
+		mp=somResolveByName(self.obj, b"somDefaultConstCopyInit")
+		somTD_SOMObject_somDefaultConstCopyInit = WINFUNCTYPE(None, c_void_p, c_void_p, c_void_p) 
+		somDefaultConstCopyInit = somTD_SOMObject_somDefaultConstCopyInit(mp)
+		somDefaultConstCopyInit(self.obj, ctrl, fromObj)
 
 	def somDefaultVCopyInit(self: SOMObject, ctrl, fromObj): #inout somInitCtrl, in SOMObject
-		pass
+		mp=somResolveByName(self.obj, b"somDefaultVCopyInit")
+		somTD_SOMObject_somDefaultVCopyInit = WINFUNCTYPE(None, c_void_p, c_void_p, c_void_p) 
+		somDefaultVCopyInit = somTD_SOMObject_somDefaultVCopyInit(mp)
+		somDefaultVCopyInit(self.obj, ctrl, fromObj)
 
 	def somDefaultConstVCopyInit(self: SOMObject, ctrl, fromObj): #inout somInitCtrl, in SOMObject
-		pass
+		mp=somResolveByName(self.obj, b"somDefaultConstVCopyInit")
+		somTD_SOMObject_somDefaultConstVCopyInit = WINFUNCTYPE(None, c_void_p, c_void_p, c_void_p) 
+		somDefaultConstVCopyInit = somTD_SOMObject_somDefaultConstVCopyInit(mp)
+		somDefaultConstVCopyInit(self.obj, ctrl, fromObj)
 
 	def somDefaultAssign(self: SOMObject, ctrl, fromObj) -> SOMObject: #inout somAssignCtrl, in SOMObject
-		pass #return SOMObject
+		mp=somResolveByName(self.obj, b"somDefaultAssign")
+		somTD_SOMObject_somDefaultAssign = WINFUNCTYPE(c_void_p, c_void_p, c_void_p, c_void_p) 
+		somDefaultAssign = somTD_SOMObject_somDefaultAssign(mp)
+		return somDefaultAssign(self.obj, ctrl, fromObj) #return SOMObject
 
 	def somDefaultConstAssign(self: SOMObject, ctrl, fromObj) -> SOMObject: #inout somAssignCtrl, in SOMObject
-		pass #return SOMObject
+		mp=somResolveByName(self.obj, b"somDefaultConstAssign")
+		somTD_SOMObject_somDefaultConstAssign = WINFUNCTYPE(c_void_p, c_void_p, c_void_p, c_void_p) 
+		somDefaultConstAssign = somTD_SOMObject_somDefaultConstAssign(mp)
+		return somDefaultConstAssign(self.obj, ctrl, fromObj) #return SOMObject
 
 	def somDefaultVAssign(self: SOMObject, ctrl, fromObj) -> SOMObject: #inout somAssignCtrl, in SOMObject
-		pass #return SOMObject
+		mp=somResolveByName(self.obj, b"somDefaultVAssign")
+		somTD_SOMObject_somDefaultVAssign = WINFUNCTYPE(c_void_p, c_void_p, c_void_p, c_void_p) 
+		somDefaultVAssign = somTD_SOMObject_somDefaultVAssign(mp)
+		return somDefaultVAssign(self.obj, ctrl, fromObj) #return SOMObject
 
 	def somDefaultConstVAssign(self: SOMObject, ctrl, fromObj) -> SOMObject: #inout somAssignCtrl, in SOMObject
-		pass #return SOMObject
+		mp=somResolveByName(self.obj, b"somDefaultConstVAssign")
+		somTD_SOMObject_somDefaultConstVAssign = WINFUNCTYPE(c_void_p, c_void_p, c_void_p, c_void_p) 
+		somDefaultConstVAssign = somTD_SOMObject_somDefaultConstVAssign(mp)
+		return somDefaultConstVAssign(self.obj, ctrl, fromObj) #return SOMObject
 
 	def somDestruct(self: SOMObject, doFree, ctrl): #in octet, inout somDestructCtrl
-		pass
+		mp=somResolveByName(self.obj, b"somDestruct")
+		somTD_SOMObject_somDestruct = WINFUNCTYPE(c_void_p, c_void_p, c_byte, c_void_p) 
+		somDestruct = somTD_SOMObject_somDestruct(mp)
+		somDestruct(self.obj, doFree, ctrl)
 

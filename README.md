@@ -13,3 +13,8 @@ classes SOMObject, SOMClass and SOMClassMgr as well as SOM.DLL functions.
 # Test
 
 Run 'somenv.cmd'
+
+# Current problems
+
+If any of wrapper classes created for kernel classes then on exit Python tries to destroy them. Such think must
+not be done.

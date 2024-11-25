@@ -42,13 +42,15 @@ class SOMClassMgr(SOMObject):
 	obj=None
 
 	def __init__(self: SOMClassMgr, obj: SOMClassMgr=None):
+		if isinstance(obj, SOMClassMgr):
+			obj=obj.obj
 		if obj==None:
 			self.SOMClassMgrClassData=SOMClassMgrClassDataStructure.in_dll(somdll,"SOMClassMgrClassData")
 			if self.SOMClassMgrClassData.classObject==None:
 				self.SOMClassMgrClassData.classObject=SOMClassMgrNewClass(1, 4)
 			mt=somResolveByName(self.SOMClassMgrClassData.classObject, b"somNew")
-			functype = WINFUNCTYPE(c_void_p, c_void_p) 
-			somNew = functype(mt)
+			somTD_SOMClass_somNew = WINFUNCTYPE(c_void_p, c_void_p) 
+			somNew = somTD_SOMClass_somNew(mt)
 			self.obj=somNew(self.SOMClassMgrClassData.classObject)
 		else:
 			self.obj=obj
@@ -62,9 +64,20 @@ class SOMClassMgr(SOMObject):
 #	void somUnregisterClassLibrary(in string libraryName);
 #	long somUnloadClassFile(in SOMClass classObj);
 #	long somUnregisterClass(in SOMClass classObj);
-#	void somBeginPersistentClasses();
-#	void somEndPersistentClasses();
+	def somBeginPersistentClasses(self):
+		mp=somResolveByName(self.obj, b"somBeginPersistentClasses")
+		somTD_SOMClassMgr_somBeginPersistentClasses = WINFUNCTYPE(None, c_void_p) 
+		somBeginPersistentClasses = somTD_SOMClassMgr_somBeginPersistentClasses(mp)
+		somBeginPersistentClasses(self.obj)
+
+	def somEndPersistentClasses(self):
+		mp=somResolveByName(self.obj, b"somEndPersistentClasses")
+		somTD_SOMClassMgr_somEndPersistentClasses = WINFUNCTYPE(None, c_void_p) 
+		somEndPersistentClasses = somTD_SOMClassMgr_somEndPersistentClasses(mp)
+		somEndPersistentClasses(self.obj)
+
 #	boolean somJoinAffinityGroup(in SOMClass newClass,in SOMClass affClass);
+
 	def somGetInitFunction(self: SOMClassMgr) -> str:
 		mp=somResolveByName(self.obj, b"somGetInitFunction")
 		somTD_SOMClassMgr_somGetInitFunction = WINFUNCTYPE(c_char_p, c_void_p) 
