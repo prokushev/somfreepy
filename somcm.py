@@ -36,22 +36,23 @@ class SOMClassMgrClassDataStructure(Structure):
 		("private24", somMToken)
 		)
 
+SOMClassMgrClassData=SOMClassMgrClassDataStructure.in_dll(somdll,"SOMClassMgrClassData")
+
 class SOMClassMgr(SOMObject):
 
-	SOMClassMgrClassData=None
-	obj=None
+#	SOMClassMgrClassData=None
+#	obj=None
 
 	def __init__(self: SOMClassMgr, obj: SOMClassMgr=None):
 		if isinstance(obj, SOMClassMgr):
 			obj=obj.obj
 		if obj==None:
-			self.SOMClassMgrClassData=SOMClassMgrClassDataStructure.in_dll(somdll,"SOMClassMgrClassData")
-			if self.SOMClassMgrClassData.classObject==None:
-				self.SOMClassMgrClassData.classObject=SOMClassMgrNewClass(1, 4)
-			mt=somResolveByName(self.SOMClassMgrClassData.classObject, b"somNew")
+			if SOMClassMgrClassData.classObject==None:
+				SOMClassMgrClassData.classObject=SOMClassMgrNewClass(1, 4)
+			mt=somResolveByName(SOMClassMgrClassData.classObject, b"somNew")
 			somTD_SOMClass_somNew = WINFUNCTYPE(c_void_p, c_void_p) 
 			somNew = somTD_SOMClass_somNew(mt)
-			self.obj=somNew(self.SOMClassMgrClassData.classObject)
+			self.obj=somNew(SOMClassMgrClassData.classObject)
 		else:
 			self.obj=obj
 

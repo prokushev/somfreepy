@@ -84,25 +84,26 @@ class SOMClassClassDataStructure(Structure):
 		("_get_somClassDeallocate", somMToken)
 		)
 
+SOMClassClassData=SOMClassClassDataStructure.in_dll(somdll,"SOMClassClassData")
+
 class SOMClass:
 	pass
 
 class SOMClass(SOMObject):
 
-	SOMClassClassData=None
+#	SOMClassClassData=None
 #	obj=None
 
 	def __init__(self: SOMClass, obj: SOMClass=None):
 		if isinstance(obj, SOMClass):
 			obj=obj.obj
 		if obj==None:
-			self.SOMClassClassData=SOMClassClassDataStructure.in_dll(somdll,"SOMClassClassData")
-			if self.SOMClassClassData.classObject==None:
-				self.SOMClassClassData.classObject=SOMClassNewClass(1, 6)
-			mt=somResolveByName(self.SOMClassClassData.classObject, b"somNew")
+			if SOMClassClassData.classObject==None:
+				SOMClassClassData.classObject=SOMClassNewClass(1, 6)
+			mt=somResolveByName(SOMClassClassData.classObject, b"somNew")
 			somTD_SOMClass_somNew = WINFUNCTYPE(c_void_p, c_void_p) 
 			somNew = somTD_SOMClass_somNew(mt)
-			self.obj=somNew(self.SOMClassClassData.classObject)
+			self.obj=somNew(SOMClassClassData.classObject)
 		else:
 			self.obj=obj
 

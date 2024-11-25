@@ -49,6 +49,7 @@ class SOMObjectClassDataStructure(Structure):
                 ("is_nil", somMToken)
                )
 
+SOMObjectClassData=SOMObjectClassDataStructure.in_dll(somdll,"SOMObjectClassData")
 
 class SOMObject:
 	pass
@@ -63,20 +64,19 @@ class SOMObject:
 #	struct somObjectOffset { SOMObject obj;	long offset; };
 #	typedef sequence<somObjectOffset> somObjectOffsets;
 
-	SOMObjectClassData=None
-	obj=None
+#	SOMObjectClassData=None
+#	obj=None
 
 	def __init__(self: SOMObject, obj: SOMObject=None):
 		if isinstance(obj, SOMObject):
 			obj=obj.obj
 		if obj==None:
-			self.SOMObjectClassData=SOMObjectClassDataStructure.in_dll(somdll,"SOMObjectClassData")
-			if self.SOMObjectClassData.classObject==None:
-				self.SOMObjectClassData.classObject=SOMObjectNewClass(1, 7)
-			mt=somResolveByName(self.SOMObjectClassData.classObject, b"somNew")
+			if SOMObjectClassData.classObject==None:
+				SOMObjectClassData.classObject=SOMObjectNewClass(1, 7)
+			mt=somResolveByName(SOMObjectClassData.classObject, b"somNew")
 			functype = WINFUNCTYPE(c_void_p, c_void_p) 
 			somNew = functype(mt)
-			self.obj=somNew(self.SOMObjectClassData.classObject)
+			self.obj=somNew(SOMObjectClassData.classObject)
 		else:
 			self.obj=obj
 
